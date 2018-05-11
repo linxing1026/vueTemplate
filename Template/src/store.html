@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <title></title>
+</head>
+<body>
+
+<div id="app">
+    <one></one>
+    <two></two>
+</div>
+
+<script src="node_modules/vue/dist/vue.js"></script>
+<script src="node_modules/vuex/dist/vuex.js"></script>
+<script>
+    (function () {
+
+        //Vuex store 项目级别状态仓库: 统一了共享状态的获取和更改方式
+        let store = new Vuex.Store({
+            state:{
+                num:1//饭菜 需要各个组件共享的数据
+            },
+            mutations:{ //pure function 根据对action的要求作出对state的修改  大厨可以修改state的地方
+                "ADD":(state,payload)=>{
+                    return  state.num+=payload
+                }
+            },
+            //用来接收组件的事件请求: 用来调用外部的api的地方
+            //服务员 用来接收传递过的动作说明，并把要求提交给mutations
+            actions:{
+
+                "INC":(store)=>{
+                    var promise = new Promise((success,reject)=>{
+                        store.commit("ADD",1);
+                        success("ok");
+                    })
+                }
+            },
+            getters:{
+                "GETNUM":(state)=>{
+                    return state.num
+                }
+            }//返回state的值
+        });
+
+        var One = {
+            methods:{
+                update:function () {
+                    this.$store.dispatch("INC")
+                }
+            },
+            template:"<div><h1>{{this.$store.state.num}}</h1><input type='button' value='+' @click='update'></div>"
+        }
+
+        var two = {
+            methods:{
+                update:function () {
+                    this.$store.dispatch("INC")
+                }
+            },
+            template:"<div><h1>{{this.$store.state.num}}</h1><input type='button' value='+' @click='update'></div>"
+        }
+
+        var vm = new Vue({
+            el:"#app",
+            store,
+            components:{
+                One,
+                two
+            }
+        });
+
+    })()
+</script>
+</body>
+</html>
